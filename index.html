@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Multiple Video Selection</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css"
+    />
+    <style>
+      body,
+      html {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      #video-container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      #video-player {
+        width: 100%;
+        height: 100%;
+      }
+
+      #audio-image {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        max-width: 50%;
+        max-height: 50%;
+      }
+
+      #controls {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        padding: 10px;
+        background-color: rgba(0, 0, 0, 0.7);
+        color: #fff;
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+
+      #controls.visible {
+        opacity: 1;
+      }
+
+      #controls button {
+        margin-right: 10px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="video-container">
+      <video id="video-player" controls></video>
+      <img id="audio-image" src="" alt="Audio Image" />
+      <div id="controls" >
+        <input type="file" id="video-upload" multiple />
+        <div class="d-flex justify-content-end">
+        <button id="image-upload-button" onclick="Cookieselector()" class="btn btn-primary">
+          Choose Image
+        </button>
+        <button id="next-button" disabled class="btn btn-primary">Next</button>
+      </div>   
+      </div>
+      
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-storage.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      const videoUploadInput = document.getElementById("video-upload");
+      const nextButton = document.getElementById("next-button");
+      const videoPlayer = document.getElementById("video-player");
+      const audioImage = document.getElementById("audio-image");
+      const controlsContainer = document.getElementById("controls");
+      const imageUploadButton = document.getElementById("image-upload-button");
+      let videos = [];
+      let currentVideoIndex = 0;
+      let mouseMovementTimeout;
+
+      // Initialize Firebase with your project credentials
+      const firebaseConfig = {
+        apiKey: "YOUR_API_KEY",
+        authDomain: "YOUR_AUTH_DOMAIN",
+        projectId: "YOUR_PROJECT_ID",
+        storageBucket: "YOUR_STORAGE_BUCKET",
+        messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+        appId: "YOUR_APP_ID",
+      };
+      firebase.initializeApp(firebaseConfig);
+
+      videoUploadInput.addEventListener("change", handleVideoSelection);
+      nextButton.addEventListener("click", playNextVideo);
+      videoPlayer.addEventListener("ended", playNextVideo);
+
+      document
+        .getElementById("video-container")
+        .addEventListener("mousemove", showControls);
+      document
+        .getElementById("video-container")
+        .addEventListener("mouseout", hideControls);
+
+      function handleVideoSelection(event) {
+        videos = Array.from(event.target.files);
+        currentVideoIndex = 0;
+        nextButton.disabled = videos.length === 0;
+        playVideo();
+      }
+
+      function playVideo() {
+        if (videos.length > 0) {
+          const videoFile = videos[currentVideoIndex];
+          const videoUrl = URL.createObjectURL(videoFile);
+
+          if (videoFile.type.startsWith("audio/")) {
+            getcok = getCookie("imgurl");
+            audioImage.src = getcok; // Replace with your audio image source
+            audioImage.style.display = "block";
+            videoPlayer.src = videoUrl;
+            videoPlayer.play();
+          } else {
+            audioImage.style.display = "none";
+            videoPlayer.style.display = "block";
+            videoPlayer.src = videoUrl;
+            videoPlayer.play();
+          }
+        }
+      }
+
+      function playNextVideo() {
+        if (videos.length > 0) {
+          currentVideoIndex = (currentVideoIndex + 1) % videos.length;
+          playVideo();
+        }
+      }
+
+      function showControls() {
+        clearTimeout(mouseMovementTimeout);
+        controlsContainer.classList.add("visible");
+        mouseMovementTimeout = setTimeout(hideControls, 2000);
+      }
+
+      function hideControls() {
+        clearTimeout(mouseMovementTimeout);
+        controlsContainer.classList.remove("visible");
+      }
+
+      function handleImageUpload() {
+        const imageUploadInput = document.createElement("input");
+        imageUploadInput.type = "file";
+        imageUploadInput.accept = "image/*";
+        imageUploadInput.addEventListener("change", handleImageSelection);
+        imageUploadInput.click();
+      }
+
+      function handleImageSelection(event) {
+        const imageFile = event.target.files[0];
+        uploadImageToFirebase(imageFile);
+      }
+
+      function uploadImageToFirebase(imageFile) {
+        const storageRef = firebase.storage().ref();
+        const imageRef = storageRef.child(imageFile.name);
+        imageRef
+          .put(imageFile)
+          .then((snapshot) => {
+            console.log("Image uploaded successfully");
+          })
+          .catch((error) => {
+            console.error("Error uploading image: ", error);
+          });
+      }
+      function Cookieselector() {
+        imgurl = prompt("Please enter the image url:", "");
+        setCookie("imgurl", imgurl, 30);
+        playVideo();
+        
+      }
+      function changeimagesource(){
+
+      }
+      // Set Cookie and Get Cookie Functions
+
+      function setCookie(cname, cvalue, exdays) {
+        const d = new Date();
+        d.setTime(d.getTime() + exdays * 24 * 60 * 60 * 1000);
+        let expires = "expires=" + d.toUTCString();
+        document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+      }
+      function getCookie(cname) {
+        let name = cname + "=";
+        let decodedCookie = decodeURIComponent(document.cookie);
+        let ca = decodedCookie.split(";");
+        for (let i = 0; i < ca.length; i++) {
+          let c = ca[i];
+          while (c.charAt(0) == " ") {
+            c = c.substring(1);
+          }
+          if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+          }
+        }
+      }
+    </script>
+  </body>
+</html>
