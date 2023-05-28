@@ -63,15 +63,17 @@
 
 <body>
   <div id="video-container">
-    <video id="video-player" style="background-color:#5e2d17;" controls></video>
+    <video id="video-player" style="background-color: brown;" controls></video>
     <img id="audio-image" src="" alt="Audio Image" />
     <div id="controls">
       <input type="file" id="video-upload" multiple />
       <div>
+        <label id="current-song-label" class="text-white"></label>
         <button id="image-upload-button" onclick="Cookieselector()" class="btn btn-warning">
           Choose Image
         </button>
         <button id="next-button" disabled class="btn btn-warning">Next</button>
+        <input type="color" id="favcolor" name="favcolor" value="#ff0000">
       </div>
     </div>
   </div>
@@ -83,11 +85,12 @@
     const audioImage = document.getElementById("audio-image");
     const controlsContainer = document.getElementById("controls");
     const imageUploadButton = document.getElementById("image-upload-button");
+    const currentSongLabel = document.getElementById("current-song-label");
+    const colorInput = document.getElementById("favcolor");
+
     let videos = [];
     let currentVideoIndex = 0;
     let mouseMovementTimeout;
-
-
 
     videoUploadInput.addEventListener("change", handleVideoSelection);
     nextButton.addEventListener("click", playNextVideo);
@@ -99,6 +102,8 @@
     document
       .getElementById("video-container")
       .addEventListener("mouseout", hideControls);
+
+    colorInput.addEventListener("input", changeVideoColor);
 
     function handleVideoSelection(event) {
       videos = Array.from(event.target.files);
@@ -114,15 +119,22 @@
 
         if (videoFile.type.startsWith("audio/")) {
           getcok = getCookie("imgurl");
-          audioImage.src = getcok; // Replace with your audio image source
+          audioImage.src = getcok;
           audioImage.style.display = "block";
           videoPlayer.src = videoUrl;
           videoPlayer.play();
+          alert(videoPlayer.src);
+
+          const currentSong = videoFile.name;
+          currentSongLabel.textContent = "Current Song: " + currentSong;
+          console.log("hi");
         } else {
           audioImage.style.display = "none";
           videoPlayer.style.display = "block";
           videoPlayer.src = videoUrl;
           videoPlayer.play();
+
+          currentSongLabel.textContent = "";
         }
       }
     }
@@ -158,18 +170,19 @@
       uploadImageToFirebase(imageFile);
     }
 
-
     function Cookieselector() {
-      imgurl = prompt("Please enter the image url:", "");
+      imgurl = prompt("Please enter the image URL:", "");
       setCookie("imgurl", imgurl, 30);
       playVideo();
     }
+
     function setCookie(cname, cvalue, exdays) {
       const d = new Date();
       d.setTime(d.getTime() + exdays * 24 * 60 * 60 * 1000);
       let expires = "expires=" + d.toUTCString();
       document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
     }
+
     function getCookie(cname) {
       let name = cname + "=";
       let decodedCookie = decodeURIComponent(document.cookie);
@@ -184,7 +197,11 @@
         }
       }
     }
+
+    function changeVideoColor() {
+      const selectedColor = colorInput.value;
+      videoPlayer.style.backgroundColor = selectedColor;
+    }
   </script>
 </body>
-
 </html>
