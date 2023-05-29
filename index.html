@@ -58,6 +58,12 @@
       display: flex;
       justify-content: flex-end;
     }
+    #current-song-label {
+  margin: auto;
+  text-align: center;
+  
+  }
+
   </style>
 </head>
 
@@ -111,12 +117,13 @@
       nextButton.disabled = videos.length === 0;
       playVideo();
     }
+    
 
     function playVideo() {
+      
       if (videos.length > 0) {
         const videoFile = videos[currentVideoIndex];
         const videoUrl = URL.createObjectURL(videoFile);
-
         if (videoFile.type.startsWith("audio/")) {
           getcok = getCookie("imgurl");
           audioImage.src = getcok;
@@ -128,13 +135,15 @@
           const currentSong = videoFile.name;
           currentSongLabel.textContent = "Current Song: " + currentSong;
           console.log("hi");
-        } else {
+        } else { 
           audioImage.style.display = "none";
           videoPlayer.style.display = "block";
           videoPlayer.src = videoUrl;
           videoPlayer.play();
+          const currentSong = videoFile.name;
+          currentSongLabel.textContent = "Current Song: " + currentSong; 
 
-          currentSongLabel.textContent = "";
+          
         }
       }
     }
@@ -142,7 +151,12 @@
     function playNextVideo() {
       if (videos.length > 0) {
         currentVideoIndex = (currentVideoIndex + 1) % videos.length;
+        
         playVideo();
+        const videoFile = videos[currentVideoIndex];
+        const videoUrl = URL.createObjectURL(videoFile);
+        currentSong = videoFile.name;
+        currentSongLabel.textContent = "Current Song: " + currentSong; 
       }
     }
 
