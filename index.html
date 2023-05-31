@@ -62,6 +62,30 @@
       margin: auto;
       text-align: center;
     }
+    .custom-file-input {
+    visibility: hidden;
+    position: absolute;
+  }
+
+  .custom-file-label {
+    display: inline-block;
+    padding: 0.375rem 0.75rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    cursor: pointer;
+  }
+
+  .custom-file-label::after {
+    content: "Browse";
+  }
+
+  .custom-file-input:disabled ~ .custom-file-label {
+    opacity: 0.65;
+  }
 
   </style>
 </head>
@@ -71,13 +95,15 @@
     <video id="video-player" style="background-color: brown;" controls></video>
     <img id="audio-image" src="" alt="Audio Image" />
     <div id="controls">
-      <input type="file" id="video-upload" multiple />
+      
+<input type="file" id="video-upload" multiple class="custom-file-input" />
+<label class="custom-file-label , btn btn-danger" for="video-upload" >Choose file</label>
       <div>
         <label id="current-song-label" class="text-white"></label>
         <button id="image-upload-button" onclick="Cookieselector()" class="btn btn-warning">
           Choose Image
         </button>
-        <button id="next-button" disabled class="btn btn-warning">Next</button>
+        <button id="next-button" class="btn btn-warning">Next</button>
         <input type="color" id="favcolor" name="favcolor" value="#ff0000">
       </div>
     </div>
