@@ -59,10 +59,9 @@
       justify-content: flex-end;
     }
     #current-song-label {
-  margin: auto;
-  text-align: center;
-  
-  }
+      margin: auto;
+      text-align: center;
+    }
 
   </style>
 </head>
@@ -93,7 +92,7 @@
     const imageUploadButton = document.getElementById("image-upload-button");
     const currentSongLabel = document.getElementById("current-song-label");
     const colorInput = document.getElementById("favcolor");
-
+    videoPlayer.style.backgroundColor = getCookie("color");
     let videos = [];
     let currentVideoIndex = 0;
     let mouseMovementTimeout;
@@ -117,10 +116,8 @@
       nextButton.disabled = videos.length === 0;
       playVideo();
     }
-    
 
     function playVideo() {
-      
       if (videos.length > 0) {
         const videoFile = videos[currentVideoIndex];
         const videoUrl = URL.createObjectURL(videoFile);
@@ -130,20 +127,17 @@
           audioImage.style.display = "block";
           videoPlayer.src = videoUrl;
           videoPlayer.play();
-          
 
           const currentSong = videoFile.name;
           currentSongLabel.textContent = "Current Song: " + currentSong;
           console.log("hi");
-        } else { 
+        } else {
           audioImage.style.display = "none";
           videoPlayer.style.display = "block";
           videoPlayer.src = videoUrl;
           videoPlayer.play();
           const currentSong = videoFile.name;
-          currentSongLabel.textContent = "Current Song: " + currentSong; 
-
-          
+          currentSongLabel.textContent = "Current Song: " + currentSong;
         }
       }
     }
@@ -151,12 +145,11 @@
     function playNextVideo() {
       if (videos.length > 0) {
         currentVideoIndex = (currentVideoIndex + 1) % videos.length;
-        
         playVideo();
         const videoFile = videos[currentVideoIndex];
         const videoUrl = URL.createObjectURL(videoFile);
         currentSong = videoFile.name;
-        currentSongLabel.textContent = "Current Song: " + currentSong; 
+        currentSongLabel.textContent = "Current Song: " + currentSong;
       }
     }
 
@@ -211,10 +204,16 @@
         }
       }
     }
+    function changethecolor() {
+      backclr = getCookie("color");
+      videoPlayer.style.backgroundColor = backclr;
+    }
 
     function changeVideoColor() {
       const selectedColor = colorInput.value;
       videoPlayer.style.backgroundColor = selectedColor;
+      setCookie("color", selectedColor, 30);
+      changethecolor();
     }
   </script>
 </body>
